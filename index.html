@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B3D24">
+<title>GH-Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E2418; --ink2:#34503F; --page:#E6EDE8; --card:#FFFFFF; --line:#B4C5B9;
+  --leaf:#0B6B3A; --leafd:#084D2A; --leaft:#D5EBDC;
+  --amber:#8F4B00; --ambert:#FFE2A8; --red:#AE2218; --redt:#FBDCD8;
+  --blue:#1A4C85; --bluet:#DAE7F6; --bar:#0B3D24;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --disp:'Barlow Condensed','Arial Narrow','Roboto Condensed',Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#E4EFE7; --ink2:#A9C0B1; --page:#0C1A12; --card:#142A1D; --line:#2E4A38;
+  --leaf:#4CC27F; --leafd:#8EE0B0; --leaft:#17402A;
+  --amber:#F2B04A; --ambert:#3F2C0A; --red:#FF8A7E; --redt:#431512;
+  --blue:#82B4EE; --bluet:#142C4A; --bar:#06220F;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 16px/1.4 var(--body);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #F2A900;outline-offset:2px}
+[hidden]{display:none!important}
+
+.top{background:var(--bar);color:#fff;padding:10px 16px;position:sticky;top:0;z-index:20}
+.top .l1{display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:1280px;margin:0 auto}
+.top h1{margin:0;font:700 30px/1 var(--disp);letter-spacing:.02em}
+.top .sub{font-size:14px;opacity:.85;flex:1;min-width:120px}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:14px;padding:4px 10px;border:1px solid rgba(255,255,255,.4);border-radius:99px}
+.dot{width:11px;height:11px;border-radius:50%;background:#6FE29B}
+.dot.snap{background:#FFD27A}.dot.off{background:#FF8A80}
+.btn{min-height:40px;padding:0 14px;border-radius:8px;border:2px solid var(--leaf);background:var(--card);font-weight:700;color:var(--leafd)}
+.btn.primary{background:var(--leaf);color:#fff}
+.top .btn{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
+.top .btn.primary{background:#fff;color:var(--bar)}
+.conn{background:var(--card);border-bottom:2px solid var(--line);padding:10px 16px}
+.conn form{max-width:1280px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.conn label{display:flex;flex-direction:column;font-size:13px;color:var(--ink2);gap:3px}
+.conn input,.conn select{min-height:40px;border:2px solid var(--line);border-radius:8px;padding:0 10px;background:var(--page);min-width:150px}
+.conn .url{flex:1;min-width:260px}.conn .url input{width:100%}
+.msg{max-width:1280px;margin:0 auto;padding:8px 16px;font-weight:700}
+.msg.bad{color:var(--red)}.msg.warn{color:var(--amber)}
+
+main{max-width:1280px;margin:0 auto;padding:14px 16px 60px}
+h2{font:700 25px/1.1 var(--disp);letter-spacing:.02em;margin:26px 0 4px;display:flex;align-items:baseline;gap:10px}
+h2 small{font:400 14px var(--body);color:var(--ink2)}
+p.hint{margin:0 0 10px;color:var(--ink2);font-size:15px}
+.empty{background:var(--card);border:2px dashed var(--line);border-radius:8px;padding:14px;color:var(--ink2)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.kpi{background:var(--card);border:2px solid var(--line);border-top:8px solid var(--leaf);border-radius:8px;padding:10px 14px}
+.kpi.amber{border-top-color:#D98200}.kpi.red{border-top-color:var(--red)}.kpi.blue{border-top-color:var(--blue)}
+.kpi b{display:block;font:700 44px/1 var(--disp)}
+.kpi span{font-size:14px;color:var(--ink2)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px}
+.card{background:var(--card);border:2px solid var(--line);border-left:10px solid var(--leaf);border-radius:8px;padding:11px 14px}
+.card.amber{border-left-color:#D98200}.card.red{border-left-color:var(--red)}.card.blue{border-left-color:var(--blue)}.card.grey{border-left-color:#7A8F80}
+.ct{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.bed{font:700 22px/1 var(--disp);letter-spacing:.02em}
+.tag{font-size:13px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--leaft);color:var(--leafd);white-space:nowrap}
+.tag.amber{background:var(--ambert);color:var(--amber)}.tag.red{background:var(--redt);color:var(--red)}.tag.blue{background:var(--bluet);color:var(--blue)}.tag.grey{background:var(--page);color:var(--ink2)}
+.nm{font-weight:700;margin-top:4px}
+.sm{font-size:14px;color:var(--ink2)}
+.bar{position:relative;height:16px;border-radius:8px;background:var(--page);border:1px solid var(--line);margin:10px 0 4px;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;display:block}
+.bar .gr{left:0;background:var(--leaft)}
+.bar .win{background:#F2B04A;opacity:.85}
+.bar .now{width:3px;background:var(--ink);z-index:2}
+.legend{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2)}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:15px}
+th{font-size:13px;color:var(--ink2);background:var(--page);text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.twrap{overflow-x:auto}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.week{font:700 18px var(--disp);letter-spacing:.03em;margin:14px 0 6px;color:var(--ink2)}
+.ev{display:flex;gap:12px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:8px;padding:6px 12px;margin-bottom:6px}
+.ev .d{font-weight:700;min-width:84px}
+.note{font-size:13px;color:var(--ink2);margin-top:30px}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="l1">
+    <h1>GH-Dashboard</h1>
+    <span class="sub">VPOS lifecycle &middot; Junction City Ranch greenhouse</span>
+    <span class="pill" id="state"><span class="dot snap"></span><span id="stateTxt">Snapshot</span></span>
+    <button class="btn" id="btnRefresh" hidden>Refresh</button>
+    <button class="btn" id="btnConn">Connection</button>
+  </div>
+</header>
+
+<section class="conn" id="conn">
+  <form id="connForm" autocomplete="off">
+    <label class="url">Web app URL (/exec)<input id="url" type="url" placeholder="https://script.google.com/macros/s/.../exec"></label>
+    <label>User<select id="user"><option value="">Load users</option></select></label>
+    <label>PIN<input id="pin" type="password" inputmode="numeric" autocomplete="current-password" style="min-width:100px;width:110px"></label>
+    <button class="btn primary" type="submit">Connect live</button>
+    <button class="btn" type="button" id="btnSnap">Use snapshot</button>
+    <button class="btn" type="button" id="btnDemo">Preview with sample activity</button>
+  </form>
+</section>
+<div class="msg" id="msg" hidden></div>
+
+<main id="app"></main>
+
+<script>
+/* ======================================================================
+   GH-Dashboard: read-only. Live data comes from the 'dash' action of Code_GH.gs.
+   Snapshot = the planned 2027 cohorts exported from VPOS-GH. Sample = labelled, illustrative activity.
+   ====================================================================== */
+const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbxI5EoHK-uRAthC9-V6X1xkXaNvGJYuBmOyI4ox7xeNiTw6rmRPA6mWbw01wKzTbtw5Aw/exec';
+const SNAPSHOT = {"beds":[{"id":"GH-1-R01","bay":"GH-1","bayName":"Greenhouse Bay 1","zone":"Cold Climate Zone","len":288,"ok":true},{"id":"GH-1-R02","bay":"GH-1","bayName":"Greenhouse Bay 1","zone":"Cold Climate Zone","len":288,"ok":true},{"id":"GH-1-R03","bay":"GH-1","bayName":"Greenhouse Bay 1","zone":"Cold Climate Zone","len":288,"ok":true},{"id":"GH-1-R04","bay":"GH-1","bayName":"Greenhouse Bay 1","zone":"Cold Climate Zone","len":288,"ok":true},{"id":"GH-1-R05","bay":"GH-1","bayName":"Greenhouse Bay 1","zone":"Cold Climate Zone","len":288,"ok":true},{"id":"GH-2-B01","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B02","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B03","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B04","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B05","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B06","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B07","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-2-B08","bay":"GH-2","bayName":"Greenhouse Bay 2","zone":"Temperate Commercial Canopy","len":288,"ok":true},{"id":"GH-3-B01","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B02","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B03","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B04","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B05","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B06","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B07","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-3-B08","bay":"GH-3","bayName":"Greenhouse Bay 3","zone":"Indigenous Specialty Canopy","len":288,"ok":true},{"id":"GH-4-G01","bay":"GH-4","bayName":"Greenhouse Bay 4","zone":"Tropical High-Wire House","len":288,"ok":true},{"id":"GH-4-G02","bay":"GH-4","bayName":"Greenhouse Bay 4","zone":"Tropical High-Wire House","len":288,"ok":true},{"id":"GH-4-G03","bay":"GH-4","bayName":"Greenhouse Bay 4","zone":"Tropical High-Wire House","len":288,"ok":true},{"id":"GH-4-G04","bay":"GH-4","bayName":"Greenhouse Bay 4","zone":"Tropical High-Wire House","len":288,"ok":true},{"id":"GH-4-G05","bay":"GH-4","bayName":"Greenhouse Bay 4","zone":"Tropical High-Wire House","len":288,"ok":true}],"cohorts":[{"id":"ASP-GH-2027-W01","cropId":"ASP-GH","crop":"Asparagus","wave":1,"bed":"","recBed":"GH-1-R01","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-02-15","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":730,"hmax":730,"exc":"","notes":""},{"id":"ASP-GH-2027-W02","cropId":"ASP-GH","crop":"Asparagus","wave":2,"bed":"","recBed":"GH-1-R01","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-03-01","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":730,"hmax":730,"exc":"","notes":""},{"id":"ASP-GH-2027-W03","cropId":"ASP-GH","crop":"Asparagus","wave":3,"bed":"","recBed":"GH-1-R01","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-03-15","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":730,"hmax":730,"exc":"","notes":""},{"id":"ONI-GH-2027-W01","cropId":"ONI-GH","crop":"Onions","wave":1,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-07","dob":"","dl":"Planting date","hs":"","he":"","lead":91,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"AMG-GH-2027-W01","cropId":"AMG-GH","crop":"Amaranth Grain","wave":1,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-12","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"CPG-GH-2027-W01","cropId":"CPG-GH","crop":"Cowpea Grain","wave":1,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-12","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"EGG-GH-2027-W01","cropId":"EGG-GH","crop":"Eggplant","wave":1,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-12","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":70,"hmax":85,"exc":"","notes":""},{"id":"TOM-GH-2027-W01","cropId":"TOM-GH","crop":"Tomatoes","wave":1,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-12","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"BEL-GH-2027-W01","cropId":"BEL-GH","crop":"Bell Pepper","wave":1,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-17","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"CPL-GH-2027-W01","cropId":"CPL-GH","crop":"Cowpea Leaves","wave":1,"bed":"","recBed":"GH-3-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-17","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":60,"exc":"","notes":""},{"id":"ONI-GH-2027-W02","cropId":"ONI-GH","crop":"Onions","wave":2,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-21","dob":"","dl":"Planting date","hs":"","he":"","lead":91,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"SP-GH-2027-W01","cropId":"SP-GH","crop":"Sweet Potatoes","wave":1,"bed":"","recBed":"GH-1-R02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-22","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":100,"hmax":120,"exc":"","notes":""},{"id":"SPD-GH-2027-W01","cropId":"SPD-GH","crop":"Spider Plant","wave":1,"bed":"","recBed":"GH-3-B07","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-22","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":50,"exc":"","notes":""},{"id":"UGW-GH-2027-W01","cropId":"UGW-GH","crop":"Ugwu","wave":1,"bed":"","recBed":"GH-3-B02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-22","dob":"","dl":"Planting date","hs":"","he":"","lead":63,"hmin":60,"hmax":90,"exc":"","notes":""},{"id":"AMG-GH-2027-W02","cropId":"AMG-GH","crop":"Amaranth Grain","wave":2,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-26","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"CPG-GH-2027-W02","cropId":"CPG-GH","crop":"Cowpea Grain","wave":2,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-26","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"EGG-GH-2027-W02","cropId":"EGG-GH","crop":"Eggplant","wave":2,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-26","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":70,"hmax":85,"exc":"","notes":""},{"id":"TOM-GH-2027-W02","cropId":"TOM-GH","crop":"Tomatoes","wave":2,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-26","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"AFE-GH-2027-W01","cropId":"AFE-GH","crop":"African Eggplant","wave":1,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-29","dob":"","dl":"Planting date","hs":"","he":"","lead":78,"hmin":75,"hmax":90,"exc":"","notes":""},{"id":"BEC-GH-2027-W01","cropId":"BEC-GH","crop":"Bird\u2019s Eye Chili","wave":1,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-29","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":75,"hmax":85,"exc":"","notes":""},{"id":"HAB-GH-2027-W01","cropId":"HAB-GH","crop":"Habanero","wave":1,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-29","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"OKR-GH-2027-W01","cropId":"OKR-GH","crop":"Okra","wave":1,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-29","dob":"","dl":"Planting date","hs":"","he":"","lead":43,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"SB-GH-2027-W01","cropId":"SB-GH","crop":"Scotch Bonnet","wave":1,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-06-29","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"BEL-GH-2027-W02","cropId":"BEL-GH","crop":"Bell Pepper","wave":2,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-01","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"CPL-GH-2027-W02","cropId":"CPL-GH","crop":"Cowpea Leaves","wave":2,"bed":"","recBed":"GH-3-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-01","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":60,"exc":"","notes":""},{"id":"MCH-GH-2027-W01","cropId":"MCH-GH","crop":"Mchicha","wave":1,"bed":"","recBed":"GH-3-B05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-01","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":45,"exc":"","notes":""},{"id":"BET-GH-2027-W01","cropId":"BET-GH","crop":"Beets","wave":1,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-05","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":55,"hmax":70,"exc":"","notes":""},{"id":"ONI-GH-2027-W03","cropId":"ONI-GH","crop":"Onions","wave":3,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-05","dob":"","dl":"Planting date","hs":"","he":"","lead":91,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"SP-GH-2027-W02","cropId":"SP-GH","crop":"Sweet Potatoes","wave":2,"bed":"","recBed":"GH-1-R02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-06","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":100,"hmax":120,"exc":"","notes":""},{"id":"SPD-GH-2027-W02","cropId":"SPD-GH","crop":"Spider Plant","wave":2,"bed":"","recBed":"GH-3-B08","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-06","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":50,"exc":"","notes":""},{"id":"UGW-GH-2027-W02","cropId":"UGW-GH","crop":"Ugwu","wave":2,"bed":"","recBed":"GH-3-B03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-06","dob":"","dl":"Planting date","hs":"","he":"","lead":63,"hmin":60,"hmax":90,"exc":"","notes":""},{"id":"CAB-GH-2027-W01","cropId":"CAB-GH","crop":"Cabbage","wave":1,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-08","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":70,"hmax":90,"exc":"","notes":""},{"id":"AMG-GH-2027-W03","cropId":"AMG-GH","crop":"Amaranth Grain","wave":3,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"CPG-GH-2027-W03","cropId":"CPG-GH","crop":"Cowpea Grain","wave":3,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":90,"hmax":120,"exc":"","notes":""},{"id":"CUC-GH-2027-W01","cropId":"CUC-GH","crop":"Cucumber","wave":1,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":29,"hmin":50,"hmax":65,"exc":"","notes":""},{"id":"EGG-GH-2027-W03","cropId":"EGG-GH","crop":"Eggplant","wave":3,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":70,"hmax":85,"exc":"","notes":""},{"id":"PEP-GH-2027-W01","cropId":"PEP-GH","crop":"Peppers","wave":1,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"TOM-GH-2027-W03","cropId":"TOM-GH","crop":"Tomatoes","wave":3,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-10","dob":"","dl":"Planting date","hs":"","he":"","lead":75,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"AFE-GH-2027-W02","cropId":"AFE-GH","crop":"African Eggplant","wave":2,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-13","dob":"","dl":"Planting date","hs":"","he":"","lead":78,"hmin":75,"hmax":90,"exc":"","notes":""},{"id":"BEC-GH-2027-W02","cropId":"BEC-GH","crop":"Bird\u2019s Eye Chili","wave":2,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-13","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":75,"hmax":85,"exc":"","notes":""},{"id":"HAB-GH-2027-W02","cropId":"HAB-GH","crop":"Habanero","wave":2,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-13","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"OKR-GH-2027-W02","cropId":"OKR-GH","crop":"Okra","wave":2,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-13","dob":"","dl":"Planting date","hs":"","he":"","lead":43,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"SB-GH-2027-W02","cropId":"SB-GH","crop":"Scotch Bonnet","wave":2,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-13","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"BEL-GH-2027-W03","cropId":"BEL-GH","crop":"Bell Pepper","wave":3,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-15","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"CPL-GH-2027-W03","cropId":"CPL-GH","crop":"Cowpea Leaves","wave":3,"bed":"","recBed":"GH-3-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-15","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":60,"exc":"","notes":""},{"id":"MCH-GH-2027-W02","cropId":"MCH-GH","crop":"Mchicha","wave":2,"bed":"","recBed":"GH-3-B05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-15","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":45,"exc":"","notes":""},{"id":"BET-GH-2027-W02","cropId":"BET-GH","crop":"Beets","wave":2,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-19","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":55,"hmax":70,"exc":"","notes":""},{"id":"CAR-GH-2027-W01","cropId":"CAR-GH","crop":"Carrots","wave":1,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-19","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":65,"hmax":80,"exc":"","notes":""},{"id":"SP-GH-2027-W03","cropId":"SP-GH","crop":"Sweet Potatoes","wave":3,"bed":"","recBed":"GH-1-R02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-20","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":100,"hmax":120,"exc":"","notes":""},{"id":"SPD-GH-2027-W03","cropId":"SPD-GH","crop":"Spider Plant","wave":3,"bed":"","recBed":"GH-3-B07","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-20","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":50,"exc":"","notes":""},{"id":"UGW-GH-2027-W03","cropId":"UGW-GH","crop":"Ugwu","wave":3,"bed":"","recBed":"GH-3-B02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-20","dob":"","dl":"Planting date","hs":"","he":"","lead":63,"hmin":60,"hmax":90,"exc":"","notes":""},{"id":"CAB-GH-2027-W02","cropId":"CAB-GH","crop":"Cabbage","wave":2,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-22","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":70,"hmax":90,"exc":"","notes":""},{"id":"CAU-GH-2027-W01","cropId":"CAU-GH","crop":"Cauliflower","wave":1,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-22","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"CUC-GH-2027-W02","cropId":"CUC-GH","crop":"Cucumber","wave":2,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-24","dob":"","dl":"Planting date","hs":"","he":"","lead":29,"hmin":50,"hmax":65,"exc":"","notes":""},{"id":"PEP-GH-2027-W02","cropId":"PEP-GH","crop":"Peppers","wave":2,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-24","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"AFE-GH-2027-W03","cropId":"AFE-GH","crop":"African Eggplant","wave":3,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-27","dob":"","dl":"Planting date","hs":"","he":"","lead":78,"hmin":75,"hmax":90,"exc":"","notes":""},{"id":"BEC-GH-2027-W03","cropId":"BEC-GH","crop":"Bird\u2019s Eye Chili","wave":3,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-27","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":75,"hmax":85,"exc":"","notes":""},{"id":"HAB-GH-2027-W03","cropId":"HAB-GH","crop":"Habanero","wave":3,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-27","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"OKR-GH-2027-W03","cropId":"OKR-GH","crop":"Okra","wave":3,"bed":"","recBed":"GH-4-G03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-27","dob":"","dl":"Planting date","hs":"","he":"","lead":43,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"SB-GH-2027-W03","cropId":"SB-GH","crop":"Scotch Bonnet","wave":3,"bed":"","recBed":"GH-4-G05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-27","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":80,"hmax":90,"exc":"","notes":""},{"id":"MCH-GH-2027-W03","cropId":"MCH-GH","crop":"Mchicha","wave":3,"bed":"","recBed":"GH-3-B05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-07-29","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":30,"hmax":45,"exc":"","notes":""},{"id":"BET-GH-2027-W03","cropId":"BET-GH","crop":"Beets","wave":3,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-02","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":55,"hmax":70,"exc":"","notes":""},{"id":"CAR-GH-2027-W02","cropId":"CAR-GH","crop":"Carrots","wave":2,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-02","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":65,"hmax":80,"exc":"","notes":""},{"id":"CAB-GH-2027-W03","cropId":"CAB-GH","crop":"Cabbage","wave":3,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-05","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":70,"hmax":90,"exc":"","notes":""},{"id":"CAU-GH-2027-W02","cropId":"CAU-GH","crop":"Cauliflower","wave":2,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-05","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"CHD-GH-2027-W01","cropId":"CHD-GH","crop":"Swiss Chard","wave":1,"bed":"","recBed":"GH-2-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-05","dob":"","dl":"Planting date","hs":"","he":"","lead":41,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"CUC-GH-2027-W03","cropId":"CUC-GH","crop":"Cucumber","wave":3,"bed":"","recBed":"GH-4-G02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-07","dob":"","dl":"Planting date","hs":"","he":"","lead":29,"hmin":50,"hmax":65,"exc":"","notes":""},{"id":"KAL-GH-2027-W01","cropId":"KAL-GH","crop":"Kale","wave":1,"bed":"","recBed":"GH-2-B04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-07","dob":"","dl":"Planting date","hs":"","he":"","lead":47,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"PEP-GH-2027-W03","cropId":"PEP-GH","crop":"Peppers","wave":3,"bed":"","recBed":"GH-4-G04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-07","dob":"","dl":"Planting date","hs":"","he":"","lead":84,"hmin":65,"hmax":75,"exc":"","notes":""},{"id":"CAR-GH-2027-W03","cropId":"CAR-GH","crop":"Carrots","wave":3,"bed":"","recBed":"GH-1-R04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-16","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":65,"hmax":80,"exc":"","notes":""},{"id":"CAU-GH-2027-W03","cropId":"CAU-GH","crop":"Cauliflower","wave":3,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-19","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"CHD-GH-2027-W02","cropId":"CHD-GH","crop":"Swiss Chard","wave":2,"bed":"","recBed":"GH-2-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-19","dob":"","dl":"Planting date","hs":"","he":"","lead":41,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"KAL-GH-2027-W02","cropId":"KAL-GH","crop":"Kale","wave":2,"bed":"","recBed":"GH-2-B05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-21","dob":"","dl":"Planting date","hs":"","he":"","lead":47,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"COL-GH-2027-W01","cropId":"COL-GH","crop":"Collard Greens","wave":1,"bed":"","recBed":"GH-2-B07","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-26","dob":"","dl":"Planting date","hs":"","he":"","lead":46,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"SUK-GH-2027-W01","cropId":"SUK-GH","crop":"Sukuma Wiki","wave":1,"bed":"","recBed":"GH-3-B04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-08-26","dob":"","dl":"Planting date","hs":"","he":"","lead":39,"hmin":50,"hmax":70,"exc":"","notes":""},{"id":"CHD-GH-2027-W03","cropId":"CHD-GH","crop":"Swiss Chard","wave":3,"bed":"","recBed":"GH-2-B06","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-02","dob":"","dl":"Planting date","hs":"","he":"","lead":41,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"LET-GH-2027-W01","cropId":"LET-GH","crop":"Lettuce","wave":1,"bed":"","recBed":"GH-2-B01","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-02","dob":"","dl":"Planting date","hs":"","he":"","lead":40,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"KAL-GH-2027-W03","cropId":"KAL-GH","crop":"Kale","wave":3,"bed":"","recBed":"GH-2-B04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-04","dob":"","dl":"Planting date","hs":"","he":"","lead":47,"hmin":55,"hmax":75,"exc":"","notes":""},{"id":"COL-GH-2027-W02","cropId":"COL-GH","crop":"Collard Greens","wave":2,"bed":"","recBed":"GH-2-B07","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-09","dob":"","dl":"Planting date","hs":"","he":"","lead":46,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"SUK-GH-2027-W02","cropId":"SUK-GH","crop":"Sukuma Wiki","wave":2,"bed":"","recBed":"GH-3-B05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-09","dob":"","dl":"Planting date","hs":"","he":"","lead":39,"hmin":50,"hmax":70,"exc":"","notes":""},{"id":"MUS-GH-2027-W01","cropId":"MUS-GH","crop":"Mustard Greens","wave":1,"bed":"","recBed":"GH-2-B08","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-12","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"BRO-GH-2027-W01","cropId":"BRO-GH","crop":"Broccoli","wave":1,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-13","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"LET-GH-2027-W02","cropId":"LET-GH","crop":"Lettuce","wave":2,"bed":"","recBed":"GH-2-B02","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-16","dob":"","dl":"Planting date","hs":"","he":"","lead":40,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"COL-GH-2027-W03","cropId":"COL-GH","crop":"Collard Greens","wave":3,"bed":"","recBed":"GH-2-B07","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-23","dob":"","dl":"Planting date","hs":"","he":"","lead":46,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"SUK-GH-2027-W03","cropId":"SUK-GH","crop":"Sukuma Wiki","wave":3,"bed":"","recBed":"GH-3-B04","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-23","dob":"","dl":"Planting date","hs":"","he":"","lead":39,"hmin":50,"hmax":70,"exc":"","notes":""},{"id":"MUS-GH-2027-W02","cropId":"MUS-GH","crop":"Mustard Greens","wave":2,"bed":"","recBed":"GH-2-B08","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-26","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"BRO-GH-2027-W02","cropId":"BRO-GH","crop":"Broccoli","wave":2,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-27","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"SPI-GH-2027-W01","cropId":"SPI-GH","crop":"Spinach","wave":1,"bed":"","recBed":"GH-2-B03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-29","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"LET-GH-2027-W03","cropId":"LET-GH","crop":"Lettuce","wave":3,"bed":"","recBed":"GH-2-B01","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-30","dob":"","dl":"Planting date","hs":"","he":"","lead":40,"hmin":45,"hmax":60,"exc":"","notes":""},{"id":"TUR-GH-2027-W01","cropId":"TUR-GH","crop":"Turnips","wave":1,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-09-30","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":55,"exc":"","notes":""},{"id":"MUS-GH-2027-W03","cropId":"MUS-GH","crop":"Mustard Greens","wave":3,"bed":"","recBed":"GH-2-B08","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-10","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"BRO-GH-2027-W03","cropId":"BRO-GH","crop":"Broccoli","wave":3,"bed":"","recBed":"GH-1-R05","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-11","dob":"","dl":"Planting date","hs":"","he":"","lead":53,"hmin":60,"hmax":80,"exc":"","notes":""},{"id":"SPI-GH-2027-W02","cropId":"SPI-GH","crop":"Spinach","wave":2,"bed":"","recBed":"GH-2-B03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-13","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"TUR-GH-2027-W02","cropId":"TUR-GH","crop":"Turnips","wave":2,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-14","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":55,"exc":"","notes":""},{"id":"SPI-GH-2027-W03","cropId":"SPI-GH","crop":"Spinach","wave":3,"bed":"","recBed":"GH-2-B03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-27","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":35,"hmax":45,"exc":"","notes":""},{"id":"TUR-GH-2027-W03","cropId":"TUR-GH","crop":"Turnips","wave":3,"bed":"","recBed":"GH-1-R03","review":"PROPOSED","status":"PLANNED","ver":false,"verBy":"","planned":"2027-10-28","dob":"","dl":"Planting date","hs":"","he":"","lead":0,"hmin":40,"hmax":55,"exc":"","notes":""}],"exceptions":[],"sessions":[],"log":[],"scouts":[],"issues":[],"scans":[],"workers":[{"id":"lisa","name":"Lisa Griffin"},{"id":"james","name":"James Clay"},{"id":"jon","name":"Jon Creem"},{"id":"linda","name":"Linda May"},{"id":"jessica","name":"Jessica Luka"}]};
+const SNAPSHOT_DATE = 'Oct 10, 2026';
+const PRE = ['PLANNED', 'RESERVED', 'PRE_PLANTING'];
+const SCOUT_DAYS = 7;
+const DAY = 864e5;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const store = {get(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }};
+const parseDay = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+const startOfToday = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const fmtDay = d => d ? d.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric'}) : '';
+const fmtStamp = ts => { if (!ts) return ''; const d = new Date(ts); return fmtDay(d) + ', ' + d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'}); };
+const ago = ts => { if (!ts) return ''; const m = Math.round((Date.now() - ts) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const diffDays = (a, b) => Math.round((a - b) / DAY);
+
+let S = {mode: 'snapshot', data: SNAPSHOT, token: '', user: null, at: null, timer: null, err: ''};
+
+/* ---------- connection ---------- */
+async function api(action, payload) {
+  const url = $('url').value.trim();
+  if (!url) throw new Error('Paste the web app URL first.');
+  const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 30000);
+  let res;
+  try { res = await fetch(url, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(Object.assign({action, token: S.token}, payload || {})), signal: ctrl.signal, redirect: 'follow'}); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'The sheet took too long to answer.' : 'Could not reach the web app. Check the URL and your connection.'); }
+  finally { clearTimeout(t); }
+  let j; try { j = await res.json(); } catch (e) { throw new Error('The web app did not return data. Check that it is deployed as a new version with access set to Anyone.'); }
+  if (!j.ok) { if (/Session expired/.test(j.error)) { S.token = ''; } throw new Error(j.error || 'Request failed'); }
+  return j;
+}
+function say(text, kind) { const m = $('msg'); m.hidden = !text; m.textContent = text || ''; m.className = 'msg ' + (kind || ''); }
+function setState() {
+  const m = S.mode, d = $('state').firstElementChild;
+  d.className = 'dot ' + (m === 'live' ? '' : m === 'off' ? 'off' : 'snap');
+  $('stateTxt').textContent = m === 'live' ? 'Live, updated ' + new Date(S.at).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'}) + (S.user ? ', ' + S.user : '')
+    : m === 'sample' ? 'Sample activity (not real data)' : m === 'off' ? 'Offline, showing snapshot' : 'Snapshot ' + SNAPSHOT_DATE;
+  $('btnRefresh').hidden = m !== 'live';
+}
+async function loadUsers() {
+  try { const j = await api('users'); $('user').innerHTML = j.users.map(u => '<option value="' + esc(u.id) + '">' + esc(u.name) + ' (' + esc(u.role) + ')</option>').join('');
+    const last = store.get('gh_dash_user'); if (last) $('user').value = last; } catch (e) {}
+}
+async function connect(ev) {
+  if (ev) ev.preventDefault();
+  say('');
+  try {
+    store.set('gh_dash_url', $('url').value.trim());
+    if (!S.token) {
+      if (!$('user').value) await loadUsers();
+      const j = await api('login', {user: $('user').value, pin: $('pin').value});
+      S.token = j.token; S.user = j.user.name; store.set('gh_dash_user', j.user.id); $('pin').value = '';
+    }
+    await pull();
+    $('conn').hidden = true;
+    clearInterval(S.timer); S.timer = setInterval(() => { if (S.mode === 'live' && !document.hidden) pull().catch(() => {}); }, 60000);
+  } catch (e) { S.mode = S.mode === 'live' ? 'off' : S.mode; say(e.message, 'bad'); setState(); }
+}
+async function pull() {
+  const j = await api('dash'); delete j.ok;
+  S.data = j; S.mode = 'live'; S.at = Date.now(); setState(); render();
+}
+
+/* ---------- derived ---------- */
+function derive(D) {
+  const today = startOfToday(), by = {};
+  const cohorts = D.cohorts.map(c => {
+    const o = Object.assign({}, c), st = c.status;
+    o.stage = PRE.includes(st) ? 'PRE' : st === 'GROWING' ? 'GROWING' : st === 'HARVEST_READY' ? 'READY' : st;
+    o.dobD = parseDay(c.dob), o.planD = parseDay(c.planned);
+    const base = o.dobD || o.planD;
+    o.hsD = parseDay(c.hs) || (base && c.hmin ? addDays(base, c.hmin) : null);
+    o.heD = parseDay(c.he) || (base && c.hmax ? addDays(base, c.hmax) : null);
+    o.day = o.dobD ? diffDays(today, o.dobD) : null;
+    return o;
+  });
+  const pre = cohorts.filter(c => c.stage === 'PRE');
+  const staged = pre.filter(c => c.bed);
+  const ready = staged.filter(c => c.ver);
+  const pending = staged.filter(c => !c.ver);
+  const proposals = pre.filter(c => !c.bed && c.review === 'PROPOSED');
+  const active = cohorts.filter(c => (c.stage === 'GROWING' || c.stage === 'READY') && c.bed);
+  const openExc = D.exceptions.filter(e => e.open);
+  return {cohorts, pre, staged, ready, pending, proposals, active, openExc, today};
+}
+
+/* ---------- views ---------- */
+const kpi = (n, label, cls) => '<div class="kpi ' + (cls || '') + '"><b>' + n + '</b><span>' + esc(label) + '</span></div>';
+const section = (title, sub, body, hint) => '<h2>' + esc(title) + (sub !== '' && sub != null ? '<small>' + esc(sub) + '</small>' : '') + '</h2>' + (hint ? '<p class="hint">' + esc(hint) + '</p>' : '') + body;
+const empty = t => '<div class="empty">' + esc(t) + '</div>';
+
+function vKpis(X) {
+  const g = X.cohorts.filter(c => c.stage === 'GROWING').length, r = X.cohorts.filter(c => c.stage === 'READY').length;
+  return '<div class="kpis">' + kpi(X.ready.length, 'Beds verified ready') + kpi(X.pending.length, 'Pending verification', 'amber') + kpi(X.openExc.length, 'Open exceptions', X.openExc.length ? 'red' : '') +
+    kpi(X.staged.length, 'Cohorts staged', 'blue') + kpi(g, 'Growing', '') + kpi(r, 'Harvest ready', '') + kpi(X.proposals.length, 'Awaiting bed approval', 'blue') + '</div>';
+}
+function vPending(X) {
+  const rows = X.pending.sort((a, b) => (a.planD || 0) - (b.planD || 0)).map(c => {
+    const d = c.planD ? diffDays(c.planD, X.today) : null;
+    const late = d !== null && d <= 3;
+    return '<div class="card ' + (late ? 'red' : 'amber') + '"><div class="ct"><span class="bed">' + esc(c.bed) + '</span><span class="tag ' + (late ? 'red' : 'amber') + '">' + (d === null ? 'No date' : d < 0 ? Math.abs(d) + ' d overdue' : d === 0 ? 'Plant today' : 'in ' + d + ' d') + '</span></div>' +
+      '<div class="nm">' + esc(c.crop) + ' <span class="sm">wave ' + esc(c.wave) + '</span></div><div class="sm">' + esc(c.id) + '</div><div class="sm">Planned ' + esc(fmtDay(c.planD) || 'unscheduled') + '. Waiting for a manager to verify the bed is ready.</div></div>';
+  }).join('');
+  return section('Pending field verification', X.pending.length, rows ? '<div class="grid">' + rows + '</div>' : empty('Nothing is waiting. Cohorts appear here once a bed is approved and before the manager verifies it ready for planting.'),
+    'Bed assigned, planting not yet verified. Planting is blocked until a manager verifies.');
+}
+function vActive(X) {
+  const cards = X.active.sort((a, b) => (a.heD || 0) - (b.heD || 0)).map(c => {
+    const dob = c.dobD, hs = c.hsD, he = c.heD, ready = c.stage === 'READY';
+    let bar = '', line = '';
+    if (dob && he) {
+      const span = Math.max(1, diffDays(he, dob) + 3), pos = x => Math.min(100, Math.max(0, diffDays(x, dob) / span * 100));
+      const l = hs ? pos(hs) : 100;
+      bar = '<div class="bar" role="img" aria-label="Day ' + c.day + ' of the cycle"><i class="gr" style="width:' + l + '%"></i>' + (hs ? '<i class="win" style="left:' + l + '%;width:' + (pos(he) - l) + '%"></i>' : '') + '<i class="now" style="left:' + pos(X.today) + '%"></i></div>' +
+        '<div class="legend"><span>' + esc(fmtDay(dob)) + '</span><span>' + (hs ? 'Harvest ' + esc(fmtDay(hs)) + ' to ' + esc(fmtDay(he)) : '') + '</span></div>';
+      if (ready) line = 'Verified mature. Harvest window ends ' + fmtDay(he) + '.';
+      else if (hs && X.today < hs) line = 'Harvest window opens in ' + diffDays(hs, X.today) + ' d.';
+      else if (hs && X.today <= he) line = 'In the harvest window now. Needs a manager to verify maturity.';
+      else line = 'Past the expected window by ' + diffDays(X.today, he) + ' d.';
+    }
+    const cls = ready ? '' : (hs && X.today >= hs ? 'amber' : 'blue');
+    return '<div class="card ' + cls + '"><div class="ct"><span class="bed">' + esc(c.bed) + '</span><span class="tag ' + (ready ? '' : 'blue') + '">' + (ready ? 'Harvest ready' : 'Growing') + '</span></div>' +
+      '<div class="nm">' + esc(c.crop) + ' <span class="sm">wave ' + esc(c.wave) + '</span></div><div class="sm">' + esc(c.dl) + ' ' + esc(fmtDay(dob)) + (c.day !== null ? ', day ' + c.day : '') + '</div>' + bar + (line ? '<div class="sm">' + esc(line) + '</div>' : '') + '</div>';
+  }).join('');
+  return section('Active lifecycle', X.active.length, cards ? '<div class="grid">' + cards + '</div>' : empty('No cohort has been planted yet. Planted cohorts show here with their date of birth, day count and harvest window.'),
+    'Anchored to the date of birth (seeding or transplant date) recorded when planting is verified.');
+}
+function lastScout(D, c) {
+  const list = D.scouts.filter(s => s.cohort === c.id || (!s.cohort && s.bed === c.bed) || (s.bed === c.bed && (!c.dobD || s.at >= c.dobD.getTime())));
+  return list.sort((a, b) => b.at - a.at)[0] || null;
+}
+function vWatch(X, D) {
+  const rows = X.active.map(c => {
+    const ls = lastScout(D, c), since = ls ? Math.floor((Date.now() - ls.at) / DAY) : null;
+    let state, cls;
+    if (since === null) { const age = c.day || 0; state = age > SCOUT_DAYS ? 'Never scouted' : 'First scout due by day ' + SCOUT_DAYS; cls = age > SCOUT_DAYS ? 'red' : 'amber'; }
+    else if (since > SCOUT_DAYS) { state = since + ' d since scout'; cls = 'red'; }
+    else if (since >= SCOUT_DAYS - 1) { state = 'Due ' + (since === SCOUT_DAYS ? 'today' : 'tomorrow'); cls = 'amber'; }
+    else { state = 'On cadence'; cls = ''; }
+    return {c, ls, since, state, cls, rank: cls === 'red' ? 0 : cls === 'amber' ? 1 : 2};
+  }).sort((a, b) => a.rank - b.rank);
+  const table = rows.length ? '<div class="twrap"><table><thead><tr><th>Bed</th><th>Crop</th><th>Last scouted</th><th>Worst finding</th><th>Status</th></tr></thead><tbody>' + rows.map(r =>
+    '<tr><td><b>' + esc(r.c.bed) + '</b></td><td>' + esc(r.c.crop) + '</td><td>' + (r.ls ? esc(fmtStamp(r.ls.at)) + '<div class="sm">' + esc(r.ls.worker) + '</div>' : '<span class="sm">none</span>') + '</td><td>' +
+    (r.ls ? '<span class="tag ' + (r.ls.sev >= 3 ? 'red' : r.ls.sev === 2 ? 'amber' : 'grey') + '">' + ['Low', 'Moderate', 'High', 'Critical'][r.ls.sev - 1] + '</span> ' + esc(r.ls.domains.join(', ')) : '') + '</td><td><span class="tag ' + r.cls + '">' + esc(r.state) + '</span></td></tr>').join('') + '</tbody></table></div>'
+    : empty('Planted cohorts are scouted every ' + SCOUT_DAYS + ' days. They will be listed here once something is growing.');
+  const feed = D.scouts.slice().sort((a, b) => (b.sev - a.sev) || (b.at - a.at)).filter(s => s.status !== 'CLOSED' && s.status !== 'RESOLVED').slice(0, 8).map(s =>
+    '<div class="card ' + (s.sev >= 4 ? 'red' : s.sev === 3 ? 'amber' : 'grey') + '"><div class="ct"><span class="bed">' + esc(s.bed) + '</span><span class="tag ' + (s.sev >= 3 ? 'red' : s.sev === 2 ? 'amber' : 'grey') + '">' + ['Low', 'Moderate', 'High', 'Critical'][s.sev - 1] + '</span></div>' +
+    '<div class="nm">' + esc(s.domains.join(', ') || 'Scouting note') + '</div>' + (s.note ? '<div class="sm">' + esc(s.note) + '</div>' : '') + '<div class="sm">' + esc(s.worker) + ', ' + esc(fmtStamp(s.at)) + '</div></div>').join('');
+  return section('Crop watchguard', rows.filter(r => r.rank < 2).length ? rows.filter(r => r.rank < 2).length + ' need scouting' : '', table, 'Seven-day scouting cadence per planted bed, from worker scouting reports.') +
+    (feed ? '<h2 style="font-size:20px">Open findings</h2><div class="grid">' + feed + '</div>' : '');
+}
+function vWorkers(X, D) {
+  const cards = D.workers.map(w => {
+    const ss = D.sessions.filter(s => String(s.worker).toLowerCase() === w.id.toLowerCase());
+    const live = ss.find(s => s.st === 'ACTIVE') || ss.find(s => s.st === 'PAUSED'), next = ss.find(s => s.st === 'ASSIGNED');
+    const last = D.log.filter(l => l.worker === w.name).sort((a, b) => (b.end || 0) - (a.end || 0))[0];
+    let tag, cls, body;
+    if (live) { cls = live.st === 'PAUSED' ? 'amber' : ''; tag = live.st === 'PAUSED' ? 'Paused' : 'Working'; body = '<div class="nm">' + esc(live.act) + '</div><div class="sm">' + esc(live.bed) + ', ' + esc(live.mins) + ' min' + (live.pr ? ', ' + esc(live.pr) : '') + '</div>'; }
+    else if (next) { cls = 'blue'; tag = 'Assigned'; body = '<div class="nm">' + esc(next.act) + '</div><div class="sm">' + esc(next.bed) + ', not started</div>'; }
+    else { cls = 'grey'; tag = 'No open task'; body = '<div class="sm">Nothing assigned right now.</div>'; }
+    return '<div class="card ' + cls + '"><div class="ct"><span class="bed">' + esc(w.name) + '</span><span class="tag ' + cls + '">' + tag + '</span></div>' + body + (last ? '<div class="sm">Last finished: ' + esc(last.act) + ' on ' + esc(last.bed) + (last.end ? ', ' + esc(ago(last.end)) : '') + '</div>' : '') + '</div>';
+  }).join('');
+  const scans = D.scans.slice().sort((a, b) => b.at - a.at).slice(0, 8);
+  const tbl = scans.length ? '<div class="twrap"><table><thead><tr><th>Bed</th><th>Cohort</th><th>Scanned</th></tr></thead><tbody>' + scans.map(s => '<tr><td><b>' + esc(s.bed) + '</b></td><td>' + esc(s.cohort || '') + '</td><td>' + esc(fmtStamp(s.at)) + ' <span class="sm">' + esc(ago(s.at)) + '</span></td></tr>').join('') + '</tbody></table></div>' : empty('No bed tag has been scanned yet. Scans from the worker app are recorded against the bed in QR_REGISTRY.');
+  return section('Worker location board', D.sessions.length + ' open tasks', cards ? '<div class="grid">' + cards + '</div>' : empty('No workers found.'), 'Where each worker is, from their open task. Tag scans below show the latest beds visited.') +
+    '<h2 style="font-size:20px">Recent bed scans</h2>' + tbl;
+}
+function vExceptions(X, D) {
+  const list = D.exceptions.slice().sort((a, b) => (b.open - a.open) || ((b.at || 0) - (a.at || 0)));
+  const body = list.length ? '<div class="twrap"><table><thead><tr><th>Status</th><th>Source</th><th>Ref / bed</th><th>Exception</th><th>Reason</th><th>Signed off</th></tr></thead><tbody>' + list.map(e =>
+    '<tr><td><span class="tag ' + (e.open ? 'red' : 'grey') + '">' + (e.open ? 'Open' : 'Signed off') + '</span></td><td>' + esc(e.src) + '</td><td><b>' + esc(e.ref) + '</b>' + (e.bed ? '<div class="sm">' + esc(e.bed) + '</div>' : '') + '</td><td>' + esc(e.type) + '</td><td>' + esc(e.note) + '</td><td>' + (e.by ? esc(e.by) : '') + (e.at ? '<div class="sm">' + esc(fmtStamp(e.at)) + '</div>' : '') + '</td></tr>').join('') + '</tbody></table></div>'
+    : empty('No exceptions or manager overrides recorded.');
+  return section('Exception overrides', X.openExc.length + ' open', body, 'Bed-assignment exceptions, cohort exceptions and manager overrides with their written reasons. Read-only here; sign-off happens in GH Manager.');
+}
+function events(X, D) {
+  const ev = [];
+  X.cohorts.forEach(c => {
+    if (c.stage === 'PRE' && c.planD) {
+      if (c.lead) ev.push({d: addDays(c.planD, -c.lead), k: 'Nursery', t: 'Start ' + c.crop + ' W' + c.wave + (c.recBed || c.bed ? ' for ' + (c.bed || c.recBed) : ''), cls: 'blue'});
+      ev.push({d: c.planD, k: 'Plant', t: c.crop + ' W' + c.wave + ' to ' + (c.bed || c.recBed || 'bed TBD') + (c.bed && !c.ver ? ' (verify first)' : ''), cls: c.bed && !c.ver ? 'red' : ''});
+      if (c.bed && !c.ver) ev.push({d: addDays(c.planD, -2), k: 'Gate', t: 'Verify bed ' + c.bed + ' ready for ' + c.crop, cls: 'amber'});
+    }
+    if (c.stage === 'PRE' && c.planD && c.hsD) ev.push({d: c.hsD, k: 'Harvest', t: c.crop + ' W' + c.wave + ' window opens', cls: 'amber'});
+    if ((c.stage === 'GROWING' || c.stage === 'READY') && c.bed) {
+      if (c.hsD && c.stage === 'GROWING') ev.push({d: c.hsD, k: 'Harvest', t: c.crop + ' on ' + c.bed + ' window opens', cls: 'amber'});
+      const ls = lastScout(D, c), base = ls ? new Date(ls.at) : c.dobD;
+      if (base) ev.push({d: addDays(new Date(base.getFullYear(), base.getMonth(), base.getDate()), SCOUT_DAYS), k: 'Scout', t: 'Scout ' + c.bed + ' (' + c.crop + ')', cls: 'blue'});
+    }
+  });
+  return ev.sort((a, b) => a.d - b.d);
+}
+function vCalendar(X, D) {
+  const ev = events(X, D), t = X.today, within = ev.filter(e => e.d >= addDays(t, -14));
+  const show = (within.filter(e => e.d <= addDays(t, 60)).length ? within.filter(e => e.d <= addDays(t, 60)) : within).slice(0, 40);
+  const wk = d => { const s = addDays(d, -d.getDay()); return s; };
+  let html = '', cur = '';
+  show.forEach(e => { const w = wk(e.d), key = iso(w); if (key !== cur) { cur = key; html += '<div class="week">Week of ' + esc(fmtDay(w)) + '</div>'; }
+    html += '<div class="ev"><span class="d">' + esc(e.d.toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'})) + '</span><span class="tag ' + (e.cls || '') + '">' + esc(e.k) + '</span><span>' + esc(e.t) + (e.d < t ? ' <span class="sm">(past)</span>' : '') + '</span></div>'; });
+  const first = ev.find(e => e.d >= t), gap = first && diffDays(first.d, t) > 60 ? 'Nothing is scheduled in the next 60 days. Showing the first scheduled items, starting ' + fmtDay(first.d) + '.' : '';
+  return section('Schedule', show.length ? show.length + ' items' : '', show.length ? html : empty('No dated items yet.'), 'Nursery start dates (planned date of birth minus propagation lead time), planting, verification gates, harvest windows and the 7-day scout cycle. ' + gap);
+}
+function vBeds(D) {
+  const occ = {}; D.cohorts.forEach(c => { if (c.bed && !['RELEASED', 'TERMINATED', 'HARVEST_COMPLETE'].includes(c.status)) occ[c.bed] = c; });
+  const bays = {}; D.beds.forEach(b => { (bays[b.bay] = bays[b.bay] || {name: b.bayName, zone: b.zone, beds: []}).beds.push(b); });
+  const html = Object.keys(bays).map(k => { const y = bays[k]; const used = y.beds.filter(b => occ[b.id]).length;
+    return '<div class="card ' + (used ? '' : 'grey') + '"><div class="ct"><span class="bed">' + esc(k) + '</span><span class="tag ' + (used ? '' : 'grey') + '">' + used + ' of ' + y.beds.length + ' beds in use</span></div><div class="nm">' + esc(y.name) + '</div><div class="sm">' + esc(y.zone) + '</div></div>'; }).join('');
+  return section('Bays', Object.keys(bays).length, '<div class="grid">' + html + '</div>');
+}
+
+function render() {
+  const D = S.data, X = derive(D);
+  $('app').innerHTML = vKpis(X) + vPending(X) + vActive(X) + vWatch(X, D) + vWorkers(X, D) + vExceptions(X, D) + vCalendar(X, D) + vBeds(D) +
+    '<p class="note">' + (S.mode === 'live' ? 'Live from the VPOS-GH sheet. Read-only; refreshes every minute.' : S.mode === 'sample' ? 'Sample activity is illustrative and is not saved anywhere. Connect live to see real data.' : 'Snapshot of the planned 2027 cohorts as exported ' + esc(SNAPSHOT_DATE) + '. Connect live for current status.') + '</p>';
+}
+
+/* ---------- sample activity (labelled, illustrative) ---------- */
+function sampleData() {
+  const D = JSON.parse(JSON.stringify(SNAPSHOT)), t = startOfToday(), at = n => Date.now() - n * 36e5, dd = n => iso(addDays(t, n));
+  const mk = (i, over) => { const c = D.cohorts[i]; Object.assign(c, over, {bed: c.recBed}); return c; };
+  const gA = mk(14, {status: 'GROWING', ver: true, dob: dd(-34), planned: dd(-34)});
+  mk(30, {status: 'GROWING', ver: true, dob: dd(-8), planned: dd(-8)});
+  const rdy = mk(40, {status: 'HARVEST_READY', ver: true, dob: dd(-52), planned: dd(-52), hs: dd(-3), he: dd(11)});
+  const pend = mk(52, {status: 'PRE_PLANTING', ver: false, planned: dd(2)});
+  mk(60, {status: 'PRE_PLANTING', ver: true, planned: dd(6)});
+  const exc = mk(70, {status: 'PRE_PLANTING', ver: false, planned: dd(12)});
+  D.cohorts.filter(c => !c.bed).slice(0, 3).forEach((c, i) => { c.planned = dd(20 + i * 7); });
+  D.sessions = [{sid: 'S1', worker: 'lisa', name: 'Lisa Griffin', bed: rdy.bed, act: 'Harvest', st: 'ACTIVE', mins: 42, pr: ''}, {sid: 'S2', worker: 'james', name: 'James Clay', bed: gA.bed, act: 'Scouting', st: 'PAUSED', mins: 18, pr: 'Waiting on irrigation'}, {sid: 'S3', worker: 'jon', name: 'Jon Creem', bed: pend.bed, act: 'Pull Plastic & Drip', st: 'ASSIGNED', mins: ''}];
+  D.log = [{bed: D.cohorts[30].bed, act: 'Transplant', worker: 'Linda May', end: at(5), min: 95, qty: '120 plants'}];
+  D.scouts = [{id: 'F1', at: at(24 * 6.5), worker: 'James Clay', bed: gA.bed, cohort: '', domains: ['Pests'], sev: 2, note: 'Light aphids on lower leaves', status: 'OPEN'},
+    {id: 'F2', at: at(30), worker: 'Jessica Luka', bed: rdy.bed, cohort: '', domains: ['Disease'], sev: 3, note: 'Leaf spot on two plants, isolate', status: 'OPEN'}];
+  D.scans = [{code: 'QR-0001', bed: rdy.bed, cohort: rdy.id, at: at(1)}, {code: 'QR-0002', bed: gA.bed, cohort: gA.id, at: at(3)}];
+  D.exceptions = [{src: 'Bed assignment', ref: exc.id, bed: exc.bed, type: 'Zoning: moved off recommended bed', note: 'Recommended bed unavailable', by: '', at: null, open: true},
+    {src: 'Manager override', ref: 'SESS-000009', bed: pend.bed, type: 'Pull Plastic & Drip', note: 'Done before app rollout', by: 'Chris Kenny', at: at(70), open: false}];
+  D.issues = [];
+  return D;
+}
+
+/* ---------- wire up ---------- */
+$('connForm').addEventListener('submit', connect);
+$('btnRefresh').addEventListener('click', () => pull().catch(e => { S.mode = 'off'; say(e.message, 'bad'); setState(); }));
+$('btnConn').addEventListener('click', () => { $('conn').hidden = !$('conn').hidden; });
+$('btnSnap').addEventListener('click', () => { clearInterval(S.timer); S.token = ''; S.user = null; S.mode = 'snapshot'; S.data = SNAPSHOT; say(''); setState(); render(); });
+$('btnDemo').addEventListener('click', () => { clearInterval(S.timer); S.mode = 'sample'; S.data = sampleData(); say(''); setState(); render(); });
+$('url').value = store.get('gh_dash_url') || DEFAULT_URL;
+$('url').addEventListener('change', () => { S.token = ''; });
+setState(); render(); loadUsers();
+</script>
+</body>
+</html>
