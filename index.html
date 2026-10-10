@@ -250,6 +250,9 @@ function vActive(X) {
   return section('Active lifecycle', X.active.length, cards ? '<div class="grid">' + cards + '</div>' : empty('No cohort has been planted yet. Planted cohorts show here with their date of birth, day count and harvest window.'),
     'Anchored to the date of birth (seeding or transplant date) recorded when planting is verified.');
 }
+const SEV = ['No issue', 'Low', 'Moderate', 'High', 'Critical'];
+const sevLabel = s => s.sev === null || s.sev === undefined ? (s.result || 'Logged') : SEV[s.sev] || s.result || 'Logged';
+const sevCls = v => v >= 3 ? 'red' : v === 2 ? 'amber' : 'grey';
 function lastScout(D, c) {
   const list = D.scouts.filter(s => s.cohort === c.id || (!s.cohort && s.bed === c.bed) || (s.bed === c.bed && (!c.dobD || s.at >= c.dobD.getTime())));
   return list.sort((a, b) => b.at - a.at)[0] || null;
@@ -266,11 +269,11 @@ function vWatch(X, D) {
   }).sort((a, b) => a.rank - b.rank);
   const table = rows.length ? '<div class="twrap"><table><thead><tr><th>Bed</th><th>Crop</th><th>Last scouted</th><th>Worst finding</th><th>Status</th></tr></thead><tbody>' + rows.map(r =>
     '<tr><td><b>' + esc(r.c.bed) + '</b></td><td>' + esc(r.c.crop) + '</td><td>' + (r.ls ? esc(fmtStamp(r.ls.at)) + '<div class="sm">' + esc(r.ls.worker) + '</div>' : '<span class="sm">none</span>') + '</td><td>' +
-    (r.ls ? '<span class="tag ' + (r.ls.sev >= 3 ? 'red' : r.ls.sev === 2 ? 'amber' : 'grey') + '">' + ['Low', 'Moderate', 'High', 'Critical'][r.ls.sev - 1] + '</span> ' + esc(r.ls.domains.join(', ')) : '') + '</td><td><span class="tag ' + r.cls + '">' + esc(r.state) + '</span></td></tr>').join('') + '</tbody></table></div>'
+    (r.ls ? '<span class="tag ' + sevCls(r.ls.sev) + '">' + esc(sevLabel(r.ls)) + '</span> ' + esc(r.ls.act) + (r.ls.value !== '' && r.ls.value != null ? ' <span class="sm">' + esc(r.ls.value) + ' ' + esc(r.ls.unit || '') + '</span>' : '') : '') + '</td><td><span class="tag ' + r.cls + '">' + esc(r.state) + '</span></td></tr>').join('') + '</tbody></table></div>'
     : empty('Planted cohorts are scouted every ' + SCOUT_DAYS + ' days. They will be listed here once something is growing.');
-  const feed = D.scouts.slice().sort((a, b) => (b.sev - a.sev) || (b.at - a.at)).filter(s => s.status !== 'CLOSED' && s.status !== 'RESOLVED').slice(0, 8).map(s =>
-    '<div class="card ' + (s.sev >= 4 ? 'red' : s.sev === 3 ? 'amber' : 'grey') + '"><div class="ct"><span class="bed">' + esc(s.bed) + '</span><span class="tag ' + (s.sev >= 3 ? 'red' : s.sev === 2 ? 'amber' : 'grey') + '">' + ['Low', 'Moderate', 'High', 'Critical'][s.sev - 1] + '</span></div>' +
-    '<div class="nm">' + esc(s.domains.join(', ') || 'Scouting note') + '</div>' + (s.note ? '<div class="sm">' + esc(s.note) + '</div>' : '') + '<div class="sm">' + esc(s.worker) + ', ' + esc(fmtStamp(s.at)) + '</div></div>').join('');
+  const feed = D.scouts.filter(s => s.sev >= 1 && s.status !== 'CLOSED' && s.status !== 'RESOLVED').sort((a, b) => (b.sev - a.sev) || (b.at - a.at)).slice(0, 8).map(s =>
+    '<div class="card ' + (s.sev >= 4 ? 'red' : s.sev === 3 ? 'amber' : 'grey') + '"><div class="ct"><span class="bed">' + esc(s.bed) + '</span><span class="tag ' + sevCls(s.sev) + '">' + esc(sevLabel(s)) + '</span></div>' +
+    '<div class="nm">' + esc(s.act || 'Scouting note') + '</div>' + (s.note ? '<div class="sm">' + esc(s.note) + '</div>' : '') + '<div class="sm">' + esc(s.worker) + ', ' + esc(fmtStamp(s.at)) + '</div></div>').join('');
   return section('Crop watchguard', rows.filter(r => r.rank < 2).length ? rows.filter(r => r.rank < 2).length + ' need scouting' : '', table, 'Seven-day scouting cadence per planted bed, from worker scouting reports.') +
     (feed ? '<h2 style="font-size:20px">Open findings</h2><div class="grid">' + feed + '</div>' : '');
 }
@@ -351,8 +354,8 @@ function sampleData() {
   D.cohorts.filter(c => !c.bed).slice(0, 3).forEach((c, i) => { c.planned = dd(20 + i * 7); });
   D.sessions = [{sid: 'S1', worker: 'lisa', name: 'Lisa Griffin', bed: rdy.bed, act: 'Harvest', st: 'ACTIVE', mins: 42, pr: ''}, {sid: 'S2', worker: 'james', name: 'James Clay', bed: gA.bed, act: 'Scouting', st: 'PAUSED', mins: 18, pr: 'Waiting on irrigation'}, {sid: 'S3', worker: 'jon', name: 'Jon Creem', bed: pend.bed, act: 'Pull Plastic & Drip', st: 'ASSIGNED', mins: ''}];
   D.log = [{bed: D.cohorts[30].bed, act: 'Transplant', worker: 'Linda May', end: at(5), min: 95, qty: '120 plants'}];
-  D.scouts = [{id: 'F1', at: at(24 * 6.5), worker: 'James Clay', bed: gA.bed, cohort: '', domains: ['Pests'], sev: 2, note: 'Light aphids on lower leaves', status: 'OPEN'},
-    {id: 'F2', at: at(30), worker: 'Jessica Luka', bed: rdy.bed, cohort: '', domains: ['Disease'], sev: 3, note: 'Leaf spot on two plants, isolate', status: 'OPEN'}];
+  D.scouts = [{id: 'F1', at: at(24 * 6.5), worker: 'James Clay', bed: gA.bed, cohort: '', act: 'Pest scouting', result: 'Moderate', value: '', unit: '', sev: 2, note: 'Light aphids on lower leaves', status: 'OPEN'},
+    {id: 'F2', at: at(30), worker: 'Jessica Luka', bed: rdy.bed, cohort: '', act: 'Disease scouting', result: 'High', value: '', unit: '', sev: 3, note: 'Leaf spot on two plants, isolate', status: 'OPEN'}];
   D.scans = [{code: 'QR-0001', bed: rdy.bed, cohort: rdy.id, at: at(1)}, {code: 'QR-0002', bed: gA.bed, cohort: gA.id, at: at(3)}];
   D.exceptions = [{src: 'Bed assignment', ref: exc.id, bed: exc.bed, type: 'Zoning: moved off recommended bed', note: 'Recommended bed unavailable', by: '', at: null, open: true},
     {src: 'Manager override', ref: 'SESS-000009', bed: pend.bed, type: 'Pull Plastic & Drip', note: 'Done before app rollout', by: 'Chris Kenny', at: at(70), open: false}];
