@@ -192,7 +192,9 @@ function derive(D) {
     if (!l.bed || !PREP_GATE.test(String(l.act || '')) || verBeds.has(l.bed)) return;
     if (!latest[l.bed] || (l.end || 0) > (latest[l.bed].end || 0)) latest[l.bed] = l;
   });
-  const bedPrep = Object.keys(latest).map(b => latest[b]).sort((a, b) => (b.end || 0) - (a.end || 0));
+  // New backend returns pendingWork (rows with no Verified_By in FIELD_ACTIVITY_LOG). Older backend: fall back to the guess above.
+  const bedPrep = Array.isArray(D.pendingWork) ? D.pendingWork.slice().sort((a, b) => (b.end || 0) - (a.end || 0))
+    : Object.keys(latest).map(b => latest[b]).sort((a, b) => (b.end || 0) - (a.end || 0));
   return {cohorts, pre, staged, ready, pending, bedPrep, proposals, active, openExc, today};
 }
 
@@ -216,7 +218,7 @@ function vPending(X) {
   const prep = X.bedPrep.map(l =>
     '<div class="card amber"><div class="ct"><span class="bed">' + esc(l.bed) + '</span><span class="tag amber">Bed verification</span></div>' +
     '<div class="nm">' + esc(l.act) + '</div><div class="sm">Done by ' + esc(l.worker || 'a worker') + (l.end ? ' &middot; ' + esc(fmtStamp(l.end)) : '') + (l.min ? ' &middot; ' + esc(l.min) + ' min' : '') + '</div>' +
-    '<div class="sm">Waiting for a manager to verify the bed is empty, cleared and checked.</div></div>').join('');
+    '<div class="sm">' + (/post/i.test(l.phase || '') ? 'Waiting for a manager to verify this clean-up step before the bed is released.' : 'Waiting for a manager to verify the bed is empty, cleared and checked.') + '</div></div>').join('');
   const all = rows + prep, n = X.pending.length + X.bedPrep.length;
   return section('Pending field verification', n, all ? '<div class="grid">' + all + '</div>' : empty('Nothing is waiting. Cohorts appear here once a bed is approved, and beds appear after a worker finishes bed prep, until a manager verifies them ready.'),
     'Planting verifications (bed assigned, not yet verified) and bed prep tasks finished by workers that a manager still has to verify. Planting is blocked until a manager verifies.');
@@ -345,6 +347,7 @@ function sampleData() {
   const exc = mk(70, {status: 'PRE_PLANTING', ver: false, planned: dd(12)});
   D.cohorts.filter(c => !c.bed).slice(0, 3).forEach((c, i) => { c.planned = dd(20 + i * 7); });
   D.sessions = [{sid: 'S1', worker: 'lisa', name: 'Lisa Griffin', bed: rdy.bed, act: 'Harvest', st: 'ACTIVE', mins: 42, pr: ''}, {sid: 'S2', worker: 'james', name: 'James Clay', bed: gA.bed, act: 'Scouting', st: 'PAUSED', mins: 18, pr: 'Waiting on irrigation'}, {sid: 'S3', worker: 'jon', name: 'Jon Creem', bed: pend.bed, act: 'Pull Plastic & Drip', st: 'ASSIGNED', mins: ''}];
+  D.pendingWork = [{id: 'LOG-900', bed: 'GH-1-R01', act: 'Pre-Plant Flush & Sanitization', worker: 'Jessica Luka', end: at(1), min: 19, qty: '1 bed'}];
   D.log = [{bed: 'GH-1-R01', act: 'Pre-Plant Flush & Sanitization', worker: 'Jessica Luka', end: at(1), min: 19, qty: '1 bed'}, {bed: D.cohorts[30].bed, act: 'Transplant', worker: 'Linda May', end: at(5), min: 95, qty: '120 plants'}];
   D.scouts = [{id: 'F1', at: at(24 * 6.5), worker: 'James Clay', bed: gA.bed, cohort: '', act: 'Pest scouting', result: 'Moderate', value: '', unit: '', sev: 2, note: 'Light aphids on lower leaves', status: 'OPEN'},
     {id: 'F2', at: at(30), worker: 'Jessica Luka', bed: rdy.bed, cohort: '', act: 'Disease scouting', result: 'High', value: '', unit: '', sev: 3, note: 'Leaf spot on two plants, isolate', status: 'OPEN'}];
