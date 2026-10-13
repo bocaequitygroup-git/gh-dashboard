@@ -293,6 +293,7 @@ const SNAPSHOT = {"beds":[{"id":"GH-1-R01","bay":"GH-1","bayName":"Greenhouse Ba
 const SNAPSHOT_DATE = 'Oct 10, 2026';
 const PRE = ['PLANNED', 'RESERVED', 'PRE_PLANTING'];
 const SCOUT_DAYS = 7;
+const SNAPMAP = {}; SNAPSHOT.cohorts.forEach(c => { SNAPMAP[c.id] = c; });
 const HARD = {"SUK-GH": 7, "CHD-GH": 7, "BTL-GH": 7, "UGW-GH": 7, "LET-GH": 7, "KAL-GH": 7, "BRO-GH": 7, "CAU-GH": 7, "CAB-GH": 7, "COL-GH": 7, "AFE-GH": 7, "EGG-GH": 7, "TOM-GH": 7, "OKR-GH": 3, "CUC-GH": 3, "SB-GH": 7, "HAB-GH": 7, "BEC-GH": 7, "PEP-GH": 7, "BEL-GH": 7, "ONI-GH": 7};   // harden-off days per crop (CROP_PROPAGATION_PARAMETERS.Harden_Days), used until the backend sends 'hard'
 const PREP_GATE = /flush|sanitiz/i;   // activities that need a manager to verify the bed before planting
 const DAY = 864e5;
@@ -347,7 +348,8 @@ function derive(D) {
   const cohorts = D.cohorts.map(c => {
     const o = Object.assign({}, c), st = c.status;
     o.stage = PRE.includes(st) ? 'PRE' : st === 'GROWING' ? 'GROWING' : st === 'HARVEST_READY' ? 'READY' : st;
-    o.dobD = parseDay(c.dob), o.planD = parseDay(c.planned);
+    const sn = SNAPMAP[c.id] || {};   // live rows can arrive without a planned date; fall back to the 2027 plan snapshot
+    o.dobD = parseDay(c.dob), o.planD = parseDay(c.planned || sn.planned);
     const base = o.dobD || o.planD;
     o.hsD = parseDay(c.hs) || (base && c.hmin ? addDays(base, c.hmin) : null);
     o.heD = parseDay(c.he) || (base && c.hmax ? addDays(base, c.hmax) : null);
